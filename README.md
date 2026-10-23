@@ -33,6 +33,7 @@ paper/         # manuscript.docx, highlights.docx
 ```bash
 pip install -r requirements.txt
 python run.py          # ~25 min on 2 CPU cores, fully deterministic (seed 42)
+python run.py --tune   # re-runs the GBDT hyper-parameter selection and ontology-coverage check
 ```
 
 ## Main results (from `results/table2_performance.csv`)

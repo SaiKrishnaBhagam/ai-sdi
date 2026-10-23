@@ -1,14 +1,36 @@
 """Reproduce every number, table and figure in the paper.
 
-    python run.py            # full run (~15 min on 2 CPU cores)
+    python run.py            # full run (~25 min on 2 CPU cores)
+    python run.py --tune     # re-run the GBDT hyper-parameter selection (Base features only)
+                             # and the ontology-coverage check reported in Section 2
 
 Outputs go to results/: table1_knowledge_layers.csv, table2_performance.csv,
-metrics.json and figure1..figure4 (.png at 600 dpi and .pdf).
+metrics.json and figure1..figure4 (.png at 600 dpi and vector .pdf).
 """
 from __future__ import annotations
 
 import json
 import os
+import sys
+
+if "--tune" in sys.argv:
+    from sklearn.ensemble import HistGradientBoostingClassifier
+    from sklearn.model_selection import StratifiedKFold, cross_val_score
+    import kexs
+    X, y, G, _, d_all = kexs.build("data/investments_VC.csv")
+    cats = d_all["cats"].explode().dropna().value_counts()
+    cov = sum(n for c, n in cats.items() if kexs.sector_of(c)) / cats.sum()
+    print(f"K1 ontology: {len(cats)} categories, {100 * cov:.1f}% of category mentions mapped")
+    cv = StratifiedKFold(5, shuffle=True, random_state=7)          # split differs from evaluation
+    grid = [(0.05, 400, 31, 30, 1), (0.03, 300, 15, 50, 3), (0.02, 500, 15, 50, 3),
+            (0.03, 300, 7, 80, 5), (0.05, 150, 15, 40, 1), (0.02, 800, 7, 50, 3)]
+    for lr, it, leaves, msl, l2 in grid:
+        m = HistGradientBoostingClassifier(learning_rate=lr, max_iter=it, max_leaf_nodes=leaves,
+                                           min_samples_leaf=msl, l2_regularization=l2,
+                                           early_stopping=False, random_state=kexs.SEED)
+        auc = cross_val_score(m, X[G["Base"]], y, cv=cv, scoring="roc_auc").mean()
+        print(f"lr={lr} trees={it} leaves={leaves} min_leaf={msl} l2={l2}:  Base AUC {auc:.4f}")
+    sys.exit(0)
 
 import matplotlib
 matplotlib.use("Agg")
