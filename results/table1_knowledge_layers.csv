@@ -1,0 +1,7 @@
+Layer,Content,Features,Knowledge source
+Base,"Raw Crunchbase fields: log amounts per funding instrument, rounds, founding and first-funding year, top-30 market and top-15 country dummies",70,Data only (no knowledge)
+K1,"Expert sector ontology: 800+ categories mapped to 10 macro-sectors, sector breadth, capital-intensity level",13,Industry taxonomy; capital-intensity view of venture finance
+K2,"Category knowledge graph: co-occurrence graph of categories, PPMI weighting, 16-d spectral embedding averaged per firm",16,Market relatedness / knowledge-graph embedding
+K3,"Venture-staging knowledge: highest stage reached, institutional / informal / non-dilutive capital shares, instrument diversity, round velocity, time to first funding",9,Staged financing and investor-signalling theory
+K4,"Ecosystem knowledge: regional and national start-up density, regional capital, market crowding, hub membership, sector location quotient",6,Agglomeration / entrepreneurial-ecosystem theory
+K5,"Monotone constraints on stage, institutional share, total funding and rounds (non-decreasing effect on exit odds)",4,Prior domain knowledge as model constraint
